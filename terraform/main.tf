@@ -179,15 +179,9 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 terraform {
   backend "s3" {
-    bucket = "bala-terraform-state-bucket"
+    bucket = "bala-devops-terraform-state-443427140918"
     key    = "flask-app/terraform.tfstate"
     region = "ap-south-1"
   }
 }
 
-resource "aws_autoscaling_group" "app_asg" {
-
-  health_check_type = "ELB"
-  health_check_grace_period = 300
-
-}
