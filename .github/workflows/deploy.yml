@@ -37,4 +37,4 @@ jobs:
       - name: Trigger Instance Refresh
         run: |
           aws autoscaling start-instance-refresh \
-          --auto-scaling-group-name bala-app-asg
+          --auto-scaling-group-name terraform-20260310123743037100000003
