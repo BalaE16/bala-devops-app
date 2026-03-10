@@ -34,3 +34,7 @@ jobs:
       - name: Push image to ECR
         run: |
           docker push 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:latest
+      - name: Trigger Instance Refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+          --auto-scaling-group-name bala-app-asg
