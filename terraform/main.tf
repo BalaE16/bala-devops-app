@@ -179,7 +179,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 terraform {
   backend "s3" {
-    bucket = "bala-devops-terraform-state-443427140918"
+    bucket = "bala-flaskapp-tfstate-2026"
     key    = "flask-app/terraform.tfstate"
     region = "ap-south-1"
   }
