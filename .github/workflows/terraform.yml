@@ -2,8 +2,8 @@ name: Terraform Infrastructure
 
 on:
   workflow_run:
-  workflows: ["Bulid and Push to ECR"]
-  types:
+   workflows: ["Bulid and Push to ECR"]
+   types:
     - completed
 
 jobs:
