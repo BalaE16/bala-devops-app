@@ -2,6 +2,10 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+data "aws_ssm_parameter" "image_tag" {
+  name = "/bala/flask-app/image-tag"
+}
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -99,6 +103,10 @@ resource "aws_launch_template" "app_lt" {
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
 
+lifecycle {
+  create_before_destroy = true
+}
+
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   iam_instance_profile {
@@ -116,10 +124,12 @@ systemctl enable docker
 aws ecr get-login-password --region ap-south-1 | \
 docker login --username AWS --password-stdin 443427140918.dkr.ecr.ap-south-1.amazonaws.com
 
-docker pull 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:latest
+IMAGE_TAG="${data.aws_ssm_parameter.image_tag.value}"
+
+docker pull 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:$IMAGE_TAG
 
 docker run -d -p 80:5000 \
-443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:latest
+443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:$IMAGE_TAG
 EOF
   )
 }
@@ -130,9 +140,9 @@ resource "aws_autoscaling_group" "app_asg" {
   min_size            = 1
   vpc_zone_identifier = data.aws_subnets.default.ids
 
-  launch_template {
+aws_launch_template.app_lt.id  launch_template {
     id      = aws_launch_template.app_lt.id
-    version = "$Latest"
+    version = aws_launch_template.app_lt.latest_version
   }
 
   instance_refresh {
@@ -185,3 +195,7 @@ terraform {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_read" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+}

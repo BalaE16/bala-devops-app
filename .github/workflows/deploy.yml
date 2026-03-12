@@ -25,16 +25,34 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t bala-flask-app .
+          IMAGE_TAG=${{ github.sha }}
+        docker build -t bala-flask-app:$IMAGE_TAG .
 
       - name: Tag Docker image
         run: |
-          docker tag bala-flask-app:latest 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:latest
+          IMAGE_TAG=${{ github.sha }}
+          docker tag bala-flask-app:$IMAGE_TAG 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:$IMAGE_TAG
 
       - name: Push image to ECR
         run: |
-          docker push 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:latest
-      - name: Trigger Instance Refresh
+          IMAGE_TAG=${{ github.sha }}
+          docker push 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:$IMAGE_TAG
+
+      - name: Store image tag in SSM
         run: |
-          aws autoscaling start-instance-refresh \
-          --auto-scaling-group-name terraform-20260310123743037100000003
+        aws ssm put-parameter \
+      --name "/bala/flask-app/image-tag" \
+      --value "${{ github.sha }}" \
+      --type String \
+      --overwrite \
+      --region ap-south-1
+
+      - name: Trigger Instance Refresh
+      run: |
+      aws autoscaling start-instance-refresh \
+      --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
+      --preferences '{
+        "MinHealthyPercentage": 90,
+        "InstanceWarmup": 180
+      }' \
+      --region ap-south-1

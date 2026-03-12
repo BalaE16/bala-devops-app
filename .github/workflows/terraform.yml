@@ -1,10 +1,10 @@
 name: Terraform Infrastructure
 
 on:
-  push:
-    paths:
-      - 'terraform/**'
-  workflow_dispatch:
+  workflow_run:
+  workflow: ["Bulid and Push to ECR"]
+  types:
+    - completed
 
 jobs:
   terraform:
