@@ -25,17 +25,17 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_TAG=${{ github.sha }}
+          IMAGE_TAG="${{ github.sha }}"
         docker build -t bala-flask-app:$IMAGE_TAG .
 
       - name: Tag Docker image
         run: |
-          IMAGE_TAG=${{ github.sha }}
+          IMAGE_TAG="${{ github.sha }}"
           docker tag bala-flask-app:$IMAGE_TAG 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:$IMAGE_TAG
 
       - name: Push image to ECR
         run: |
-          IMAGE_TAG=${{ github.sha }}
+          IMAGE_TAG="${{ github.sha }}"
           docker push 443427140918.dkr.ecr.ap-south-1.amazonaws.com/bala-flask-app:$IMAGE_TAG
 
       - name: Store image tag in SSM
@@ -50,7 +50,7 @@ jobs:
       - name: Trigger Instance Refresh
       run: |
       aws autoscaling start-instance-refresh \
-      --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
+      --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
       --preferences '{
         "MinHealthyPercentage": 90,
         "InstanceWarmup": 180
