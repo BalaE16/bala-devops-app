@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
+     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -41,18 +41,18 @@ jobs:
       - name: Store image tag in SSM
         run: |
          aws ssm put-parameter \
-         --name "/bala/flask-app/image-tag" \
-         --value "${{ github.sha }}" \
-         --type String \
-         --overwrite \
-         --region ap-south-1
+          --name "/bala/flask-app/image-tag" \
+          --value "${{ github.sha }}" \
+          --type String \
+          --overwrite \
+          --region ap-south-1
 
       - name: Trigger Instance Refresh
       run: |
-       aws autoscaling start-instance-refresh \
-       --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
-       --preferences '{
-       "MinHealthyPercentage": 90,
-       "InstanceWarmup": 180
-       }' \
-       --region ap-south-1
+        aws autoscaling start-instance-refresh \
+          --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
+          --preferences '{
+          "MinHealthyPercentage": 90,
+          "InstanceWarmup": 180
+          }' \
+          --region ap-south-1
